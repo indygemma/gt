@@ -1,0 +1,19 @@
+Schreiben sie folgendes Programm:
+
+  * Visualisieren mit OGRE
+  * Ein Irrgarten mit Mauern
+  * Mit der Maus kann einen Ball in den Irrgarten werfen, der Ball
+    prallt von Mauern und Boden ab, hüpft herum bis er schliesslich
+    liegen bleibt.
+  * Es gibt immer nur einen Ball, frühere Bälle verschwinden
+  * Im Irrgarten sitzt ein Tier (Hund, Katze, Stier, etc)
+  * Sowie ein Ball herumfliegt/liegt versucht das Tier zum Ball zu
+    laufen (durch den Irrgarten), schnappt ihn sich und bringt in zu
+    einem bestimmten Platz
+  * Regelmäßg bekommt das Tier Hunger und läuft dann statt hinter dem
+    Ball her, zu einer Futterstelle um dort zu fressen
+
+
+Viel Spass
+
+HH
