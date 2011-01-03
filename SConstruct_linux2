@@ -1,0 +1,84 @@
+import sys, os
+from distutils import sysconfig
+
+env = Environment()
+
+defines = [
+    "OGRE_GUI_GLX",
+    "OGRE_CONFIG_BIG_ENDIAN",
+]
+
+include_dirs = [
+    "../include_linux2/bullet-2.76",
+    "/usr/include/OGRE",
+    "include",
+    "lib/luajit",
+    "src/lua",
+]
+
+library_dirs = [
+    "../include_linux2/bullet-2.76/BulletDynamics",
+    "../include_linux2/bullet-2.76/BulletCollision",
+    "../include_linux2/bullet-2.76/LinearMath",
+    "../include_linux2/bullet-2.76/BulletMultiThreaded",
+    "../include_linux2/bullet-2.76/BulletSoftBody",
+    "lib/luajit"
+]
+
+libraries = [
+    "BulletDynamics",
+    "BulletCollision",
+    "LinearMath",
+    "OIS",
+    "GL",
+    "OgreMain",
+    #"BulletMultiThreaded",
+    #"BulletSoftBody",
+    "luajit",
+    "dl",
+    "m",
+]
+
+link_flags = [
+    "-g",
+    "-Wall",
+    "-Weffc++",
+    "-Wextra"
+]
+
+src= [
+    "listener.cpp",
+    "core.cpp",
+    "particle.cpp",
+    "pfgen.cpp",
+    "app.cpp",
+    "pworld.cpp",
+    "plinks.cpp",
+    "pcontacts.cpp",
+    "main.cpp"
+]
+
+USE_PYTHON = False
+
+if USE_PYTHON:
+    var = lambda x: sysconfig.get_config_var(x).split(" ")
+    version = sys.version[:3]
+    include_dirs += ["/usr/include/python"+version]
+    library_dirs += var("LIBDIR") + var("LIBPL")
+    libraries    += ["python"+version]
+    link_flags   += var("LINKFORSHARED") + var("LIBS") + var("SYSLIBS")
+    main_src      = "python/python_main.cpp"
+    os.system("cython --cplus --embed src/python/python_main.pyx -o src/python/python_main.cpp")
+else:
+    main_src      = "main.cpp"
+
+env["CPPDEFINES"] = defines
+env["LIBS"]       = libraries
+env["LIBPATH"]    = ":".join(library_dirs)
+env["CPPPATH"]    = include_dirs
+env["LINKFLAGS"]  = link_flags
+
+#src += [main_src]
+
+env.Program("bin/linux2/abgabe8", src, srcdir="src")
+

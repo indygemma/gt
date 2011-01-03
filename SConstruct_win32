@@ -1,0 +1,89 @@
+Import("env")
+
+include_dirs = [
+	"../include_win32",
+    "../include_win32/OGRE",
+    "../include_win32/OIS",
+    "../include_win32/bullet",
+]
+
+libraries = [
+    "OgreMain",
+    "OIS",
+    "BulletDynamics",
+    "BulletCollision",
+    "LinearMath",
+    "kernel32",
+    "user32",
+    "gdi32",
+    "winspool",
+    "comdlg32",
+    "advapi32",
+    "shell32",
+    "ole32",
+    "oleaut32",
+    "uuid",
+    "odbc32",
+    "odbccp32",
+
+	#"dsound",
+	#"dxguid",
+	#"d3dx",
+	#"winmm",
+	#"opengl32",
+	#"wininet",
+]
+
+library_dirs = [
+    "../lib_win32/",
+	#"C:/Program Files/Microsoft Visual Studio 8/VC/lib",
+	#"C:/Program Files/Microsoft Visual Studio 8/VC/PlatformSDK/lib",
+]
+
+extra_compile_args = [
+	#"/MD",
+	#'/D "BOOST_ALL_NO_LIB"',
+	#'/D "BOOST_PYTHON_STATIC_LIB"',
+	"/Od",
+	"/MTd",
+	'/D "_NDEBUG"',
+	'/D "_WINDOWS"',
+	'/D "WIN32"',
+	"/nologo",
+	'/D "UNICODE"',
+	'/D "_UNICODE"',
+	'/Gd',
+	'/TP',
+	'/Gm',
+	'/EHsc',
+	'/ZI',
+	'/W3',
+	'/c',
+	'/Wp64',
+	'/errorReport:prompt'
+	#'/RTC1',
+]
+
+extra_link_flags = [
+	'/NODEFAULTLIB:"LIBC.LIB"',
+	'/NODEFAULTLIB:"LIBCMT.LIB"',
+	#'/NODEFAULTLIB:"MSVCRT.LIB"',
+	'/nologo',
+	'/SUBSYSTEM:WINDOWS',
+	'/MACHINE:X86',
+	'/MANIFEST',
+	'/MANIFESTFILE:"build\\abgabe2.exe.manifest"',
+	'/ENTRY:"wWinMainCRTStartup"',
+]
+
+env["LIBS"]     = libraries
+env["LIBPATH"]  = ";".join(library_dirs)
+env["CPPPATH"]  = include_dirs
+env["CCFLAGS"]  = extra_compile_args
+env["LINKFLAGS"] = extra_link_flags
+
+env.Program("bin/win32/abgabe5.exe", [
+    "main.cpp",
+    "listener.cpp",
+    "app.cpp"
+])

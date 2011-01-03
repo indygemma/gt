@@ -1,0 +1,5 @@
+- remove python, and integrate luajit. make it compilable
+- expose function in lua to render a model, the wall model maybe
+- create logic in lua to render a labyrinth with models.
+- find out how to do path finding, and implement in lua
+- implement actor logic (maybe concurrently)
