@@ -13,4 +13,32 @@ local GRID = {
     {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, -- 8
 }
 
-A.printnodes(A.findpath(GRID, 3,2,20,4))
+-- A.printnodes(A.findpath(GRID, 3,2,20,4))
+
+require "entity"
+
+a = Animal("angie")
+a2 = Animal("brian")
+
+function customloop(a,b,c)
+    local snapshot = os.clock()
+    local s1 = os.clock()
+    local count = 0
+    while 1 do
+        count = count + 1
+        print "----"
+        print( string.format("just waited %.2f seconds", os.clock()-s1))
+        print( string.format("Elapsed time %.2f", os.clock() - snapshot))
+        print("adhoc coroutine", count)
+        print( a,b,c )
+        print "----"
+        s1 = os.clock()
+        coroutine.yield({sleep=0.5})
+    end
+end
+
+scheduler.register(customloop, {1,2,3})
+
+for i=1,5000000 do
+    scheduler.step()
+end

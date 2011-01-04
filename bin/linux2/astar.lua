@@ -111,7 +111,7 @@ local function printnodes(list)
 end
 
 local function findneighbors(grid,node)
-    -- returns a list of neighbor nodes that are valid
+    -- returns a list of neighbor nodes that are valid.
     -- walls are defined as INACCESSABLE_TILE, every other value is acceptable
     local w = table.getn(grid[1])
     local h = table.getn(grid)
@@ -169,10 +169,10 @@ local function findpath(grid,x1,y1,x2,y2)
             local close_idx,_ = neighbor_in( close, neighbor )
             if open_idx ~= nil and
                cost < g(x1,y1,neighbor) then
-               table.remove( open, idx )
+               table.remove( open, open_idx )
             elseif close_idx ~= nil and
                cost < g(x1,y1,neighbor) then
-              table.remove( close, idx )
+              table.remove( close, close_idx )
             elseif open_idx == nil and close_idx == nil then
                 neighbor.cost = cost + h(neighbor,x2,y2)
                 neighbor.parent = current

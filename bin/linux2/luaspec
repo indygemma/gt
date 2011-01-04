@@ -1,0 +1,9 @@
+#!/usr/bin/env lua
+
+package.path = "src/?.lua;example/?.lua;"..package.path
+
+for i=1,#arg do
+	dofile(arg[i])
+end
+
+spec:report(true)

@@ -7,8 +7,10 @@
     - maybe: game.app.add_entity( filename, x,y,z )
 - implement actor logic (maybe concurrently)
     - e = game.entity.new( filename, x, y, z )
-    - e:update() <-- concurrent
+    + e:update() <-- concurrent
     - e:move( x,y,z )
+    - animal logic
+    - ball logic
 - create logic in lua to render a labyrinth with models.
 + find out how to do path finding, and implement in lua
 - https://code.google.com/p/simple-lua-wrapper/source/browse/LuaWrapper.h
