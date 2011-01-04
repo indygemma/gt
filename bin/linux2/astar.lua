@@ -47,6 +47,7 @@ function neighbor_in(t,node)
     end)
 end
 
+-- for g(node) calculation
 function distance(x1,y1,x2,y2)
     return math.abs(x1-y1) + math.abs(y1-y2)
 end
@@ -117,47 +118,28 @@ function findpath(grid,x1,y1,x2,y2)
 
     local current = nil
     repeat
-        --remove lowest rank item from OPEN
         current = table.remove( open, 1 )
-        --print( "current node", current.x, current.y )
-        --add current to CLOSED
         table.insert(close, 1, current)
-        --for neighbors of current:
         for i,neighbor in ipairs(findneighbors(grid,current)) do
-            --cost = g(current) + movementcost(current, neighbor)
             local cost = distance(x1,y1,current.x,current.y) + D
-            --if neighbor in OPEN and cost less than g(neighbor):
             local open_idx,_  = neighbor_in( open, neighbor )
             local close_idx,_ = neighbor_in( close, neighbor )
             if open_idx ~= nil and
                cost < distance(x1,y1,neighbor.x,neighbor.y) then
-               --remove neighbor from OPEN, because new path is better
                table.remove( open, idx )
-            --if neighbor in CLOSED and cost less than g(neighbor): **
             elseif close_idx ~= nil and
                cost < distance(x1,y1,neighbor.x,neighbor.y) then
-              --remove neighbor from CLOSED
               table.remove( close, idx )
-            --if neighbor not in OPEN and neighbor not in CLOSED:
             elseif open_idx == nil and close_idx == nil then
-                --set g(neighbor) to cost
-                neighbor.cost = cost +
-                                diagonal_distance(D,D2,
-                                                  neighbor.x,neighbor.y,
-                                                  x2,y2)
+                neighbor.cost = cost + diagonal_distance(D,D2,
+                                                         neighbor.x,neighbor.y,
+                                                         x2,y2)
                 neighbor.parent = current
-                --add neighbor to OPEN
                 table.insert( open, neighbor )
-                --set priority queue rank to g(neighbor) + h(neighbor)
                 open = sort( open )
-                --set neighbor's parent to current
-                --print( neighbor.x, neighbor.y, "not in open", neighbor.cost )
             end
         end
     until current.x == x2 and current.y == y2
-    --print( "open length:", table.getn(open) )
-    --printnodes( open )
-    --print( "found end node", current.x, current.y )
     local result = {}
     local parent = current
     repeat
