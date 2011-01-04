@@ -10,4 +10,13 @@
     - e:update() <-- concurrent
     - e:move( x,y,z )
 - create logic in lua to render a labyrinth with models.
-- find out how to do path finding, and implement in lua
++ find out how to do path finding, and implement in lua
+- https://code.google.com/p/simple-lua-wrapper/source/browse/LuaWrapper.h
+- great thread on gamedev where the OP outlines the way he does C++ class binding without external dependencies
+  http://www.gamedev.net/community/forums/topic.asp?topic_id=571139
+- in the same way http://lua-users.org/wiki/DoItYourselfCppBinding
+
+-- http://luakit.org/projects/luakit
+-- user data official doc http://www.lua.org/pil/28.1.html
+-- lua faq http://www.luafaq.org/
+
