@@ -9,5 +9,10 @@
 #include <cstdlib>
 #include <vector>
 #include <fstream>
+#include <lua.hpp>
+#include "script.h"
+
+extern script_t *SCRIPT;
+extern SampleApp *APP;
 
 #endif

@@ -27,7 +27,7 @@ library_dirs = [
 
 libraries = [
     "BulletDynamics",
-    "BulletCollision",
+   "BulletCollision",
     "LinearMath",
     "OIS",
     "GL",
@@ -55,8 +55,16 @@ src= [
     "pworld.cpp",
     "plinks.cpp",
     "pcontacts.cpp",
+    "script.cpp",
     "main.cpp"
 ]
+
+USE_LUA = True
+
+if USE_LUA:
+    src += [
+        "lua/lua_game.cpp"
+    ]
 
 USE_PYTHON = False
 

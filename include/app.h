@@ -37,6 +37,13 @@ public:
     void spawnBall();
     void shootBall();
 
+    void addEntity(const char *name, const char *filename, const char *nodename,
+                   int x, int y, int z);
+
+
+    int on_mouseclick_ref;
+    int on_scenesetup_ref;
+
 private:
 
     cyclone::ParticleGravity  _particleGravity;

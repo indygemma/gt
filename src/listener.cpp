@@ -23,9 +23,27 @@ bool MyListener::processUnbufferedMouseInput(const FrameEvent& evt) {
         // left mouse released. initiate click
         std::cout << "PRESSED LEFT MOUSE KEY: Spawning Particles" << std::endl;
         mApp->spawnBox(0,400,0);
+
+        // run callback
+        lua_pushinteger(SCRIPT->L, 1);
+        lua_pushinteger(SCRIPT->L, ms.X.abs);
+        lua_pushinteger(SCRIPT->L, ms.Y.abs);
+        lua_pushinteger(SCRIPT->L, ms.Z.abs);
+        script_pcallback(SCRIPT, mApp->on_mouseclick_ref, 4, 0);
+        script_stack_pop(SCRIPT, 0);
+
         mLeftMouseDown = false;
     } else if (mRightMouseDown) {
         mApp->shootBall();
+
+        // run callback
+        lua_pushinteger(SCRIPT->L, 2);
+        lua_pushinteger(SCRIPT->L, ms.X.abs);
+        lua_pushinteger(SCRIPT->L, ms.Y.abs);
+        lua_pushinteger(SCRIPT->L, ms.Z.abs);
+        script_pcallback(SCRIPT, mApp->on_mouseclick_ref, 4, 0);
+        script_stack_pop(SCRIPT, 0);
+
         mRightMouseDown = false;
     }
     return ExampleFrameListener::processUnbufferedMouseInput(evt);

@@ -1,5 +1,13 @@
-- remove python, and integrate luajit. make it compilable
-- expose function in lua to render a model, the wall model maybe
++ remove python, and integrate luajit. make it compilable
++ expose callback handlers:
+    + game.on_mouseclick
+        added script_pcallback, script_register_callback for general callback invocation
+- expose the app instance as game.app
+    + game.app.setup_scene() -- to draw something on setup later
+    - maybe: game.app.add_entity( filename, x,y,z )
+- implement actor logic (maybe concurrently)
+    - e = game.entity.new( filename, x, y, z )
+    - e:update() <-- concurrent
+    - e:move( x,y,z )
 - create logic in lua to render a labyrinth with models.
 - find out how to do path finding, and implement in lua
-- implement actor logic (maybe concurrently)

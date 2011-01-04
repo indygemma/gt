@@ -37,6 +37,8 @@ _particleGravity(cyclone::ParticleGravity(Vector3(0, -9.81, 0))),
 _particleBuoyancy(cyclone::ParticleBuoyancy(5, 0.1, -10, 1000)),
 _world(new cyclone::ParticleWorld(1000))
 {
+    on_mouseclick_ref = script_register_callback(SCRIPT, "game.on_mouseclick");
+    on_scenesetup_ref = script_register_callback(SCRIPT, "game.app.on_scenesetup");
 }
 
 SampleApp::~SampleApp() {
@@ -58,6 +60,7 @@ void SampleApp::createViewPorts(void) {
 }
 
 void SampleApp::spawnBox(int x, int y, int z) {
+
     int d = 100;
     ParticleEntity *p1 = spawnParticle(Vector3(x  ,y  ,z  ), Vector3(0,0,0), false);
     ParticleEntity *p2 = spawnParticle(Vector3(x+d,y  ,z  ), Vector3(0,0,0), false);
@@ -264,18 +267,28 @@ void SampleApp::createScene(void)
         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
         500, 500, 20, 20, true, 1, 5, 5, Vector3::UNIT_Z);
 
-    ent = mSceneMgr->createEntity("GroundEntity", "ground");
-    SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-    node->attachObject(ent);
-    node->setPosition(Vector3(0, -0.5, 0));
-    ent->setMaterialName("Examples/Rockwall");
-    ent->setCastShadows(false);
+    //ent = mSceneMgr->createEntity("GroundEntity", "ground");
+    //SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    //node->attachObject(ent);
+    //node->setPosition(Vector3(0, -0.5, 0));
+    //ent->setMaterialName("Examples/Rockwall");
+    //ent->setCastShadows(false);
 
     light = mSceneMgr->createLight("Light3");
     light->setType(Light::LT_DIRECTIONAL);
     light->setDiffuseColour(ColourValue( .25, .25, 0));
     light->setSpecularColour(ColourValue( .25, .25, 0));
     light->setDirection(Vector3( 0, -1, 1 ));
+
+    script_pcallback(SCRIPT, on_scenesetup_ref, 0, 0);
+}
+
+void SampleApp::addEntity(const char *name, const char *filename, const char *nodename,
+                          int x, int y, int z) {
+    Entity *ent = mSceneMgr->createEntity(name, filename);
+    SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode(nodename);
+    node->attachObject(ent);
+    node->setPosition(Vector3(x, y, z));
 }
 
 void SampleApp::spawnBall() {
