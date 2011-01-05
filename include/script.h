@@ -11,6 +11,8 @@ struct script_t {
 
 script_t *script_new();
 
+void    script_bind(script_t *script);
+
 void    script_error(script_t *script, const char *fmt, ...);
 void    script_free(script_t *script);
 
@@ -25,4 +27,14 @@ void    script_vpcallback(script_t *script, int cbid, const char *fmt, ...);
 int     script_stack_size(script_t *script);
 void    script_stack_pop(script_t *script, int count);
 
+//--- helper functions for binding
+
+void    script_binder_init(script_t *script, const char *tname,
+                                             const luaL_reg *flist,
+                                             int (*destroy)(lua_State*));
+void    script_binder_pushusertype(script_t *script, void *udata,
+                                                     const char *tname);
+void   *script_binder_checkusertype(script_t *script, int index,
+                                                      const char *tname);
+void    script_binder_releaseusertype(script_t *script, void *udata);
 #endif

@@ -18,6 +18,7 @@ int main(int argc, char **argv)
     // NOTE: somehow when defining script as a public member of SampleApp, Listener won't return the correct reference to lua refs. No problem if the ref is called within SampleApp
     // I think this has to do with the map, with char* as key. the address might have changed
     SCRIPT = script_new();
+    script_bind(SCRIPT);
     script_run(SCRIPT, "autoexec.lua");
     std::cout << script_stack_size(SCRIPT) << std::endl;
     printf("address of script: %d\n", SCRIPT);

@@ -12,11 +12,25 @@ script_t *script_new() {
 
     script->L = lua_open();
     luaL_openlibs(script->L);
-    luaopen_game(script->L);
 
     lua_settop(script->L, 0); // clear the stack
 
     return script;
+}
+
+// from lib_init.c
+// call a c function in lua context. This is for example required
+// in script_binder_init, where lua_replace(L, LUA_ENVIRONINDEX)
+// causes a PANIC on runtime, when called from C.
+void run_in_lua(script_t *script, int (*f)(lua_State*)) {
+    lua_pushcfunction(script->L, f);
+    //lua_pushstring(L, lib->name);
+    lua_call(script->L, 0, 0);
+}
+
+void script_bind(script_t *script) {
+    //luaopen_game(script->L);
+    run_in_lua(script, luaopen_game);
 }
 
 void script_error(script_t *script, const char *fmt, ...) {
@@ -127,4 +141,62 @@ int script_stack_size(script_t *script) {
 
 void script_stack_pop(script_t *script, int count) {
     lua_pop(script->L, count);
+}
+
+//--- helper functions for object binding
+// source: Game Programming Gems 6 Page 347+
+// Chapter "Binding C/C++ Objects to Lua"
+//
+// TODO: there is another method shown as the last alternative with
+//       native tables. try that one out if the current approach
+//       seems to become a bottleneck.
+
+void script_binder_init(script_t *script, const char *tname,
+                                             const luaL_reg *flist,
+                                             int (*destroy)(lua_State*)) {
+    lua_State *L = script->L;
+    lua_newtable(L);                  // create table for uniqueness
+    lua_pushstring(L, "v");
+    lua_setfield(L, -2, "__mode");    // set as weak-value table
+    lua_pushvalue(L, -1);             // duplicate table onto stack
+    lua_setmetatable(L, -2);          // set itself as metatable
+    lua_replace(L, LUA_ENVIRONINDEX); // set table as env table
+    luaL_register(L, tname, flist);   // create libtable
+    luaL_newmetatable(L, tname);      // create metatable for objects
+    lua_pushvalue(L, -2);
+    lua_setfield(L, -2, "__index");   // mt.__index = libtable
+    lua_pushcfunction(L, destroy);
+    lua_setfield(L, -2, "__gc");      // mt.__gc = destroy
+    lua_pop(L, 1);                    // pop metatable
+    // TODO: the stack is left with one item on top. what is it??
+}
+
+void script_binder_pushusertype(script_t *script, void *udata,
+                                                     const char *tname) {
+    lua_State *L = script->L;
+    lua_pushlightuserdata(L,udata);
+    lua_rawget(L, LUA_ENVIRONINDEX); // get udata in env table
+    if (lua_isnil(L, -1)) {
+        void ** ubox = (void**)lua_newuserdata(L,sizeof(void*));
+        *ubox = udata;                  // store address in udata
+        luaL_getmetatable(L,tname);     // get metatable
+        lua_setmetatable(L, -2);        // set metatable for udata
+        lua_pushlightuserdata(L,udata); // push address
+        lua_pushvalue(L, -2);           // push udata
+        lua_rawset(L,LUA_ENVIRONINDEX); // envtable[address] = udata
+    }
+}
+
+void *script_binder_checkusertype(script_t *script, int index,
+                                                      const char *tname) {
+    void **udata = (void**)luaL_checkudata(script->L, index, tname);
+    if (udata == 0)
+        luaL_typerror(script->L,index,tname);
+    return *udata;
+}
+
+void script_binder_releaseusertype(script_t *script, void *udata) {
+    lua_pushlightuserdata(script->L, udata);
+    lua_pushnil(script->L);
+    lua_settable(script->L, LUA_ENVIRONINDEX);
 }

@@ -2,16 +2,24 @@
 + expose callback handlers:
     + game.on_mouseclick
         added script_pcallback, script_register_callback for general callback invocation
-- expose the app instance as game.app
++ expose the app instance as game.app
     + game.app.setup_scene() -- to draw something on setup later
-    - maybe: game.app.add_entity( filename, x,y,z )
+    + maybe: game.app.add_entity( filename, x,y,z )
 - implement actor logic (maybe concurrently)
     - e = game.entity.new( filename, x, y, z )
     + e:update() <-- concurrent
     - e:move( x,y,z )
-    - animal logic
+    + animal logic
     - ball logic
 - create logic in lua to render a labyrinth with models.
+    + add ability to call code like ( proper wrapping required. DONE )
+
+        node = game.app.add_entity("cube"..i, "cube.mesh", "cube"..i, i*1,0,0)
+        node:setScale(0.01, 0.01, 0.01)
+        node:getAttachedObject(0):setMaterialName("Examples/SphereMappedRustySteel")
+
+    - translate a 2D grid to 3d labyrinth
+
 + find out how to do path finding, and implement in lua
 - https://code.google.com/p/simple-lua-wrapper/source/browse/LuaWrapper.h
 - great thread on gamedev where the OP outlines the way he does C++ class binding without external dependencies

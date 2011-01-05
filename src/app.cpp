@@ -39,6 +39,7 @@ _world(new cyclone::ParticleWorld(1000))
 {
     on_mouseclick_ref = script_register_callback(SCRIPT, "game.on_mouseclick");
     on_scenesetup_ref = script_register_callback(SCRIPT, "game.app.on_scenesetup");
+    on_update_ref     = script_register_callback(SCRIPT, "game.app.on_update");
 }
 
 SampleApp::~SampleApp() {
@@ -241,6 +242,8 @@ void SampleApp::update(const FrameEvent& evt) {
             std::cout << "PARTICLE DEAD ==================================================================" << std::endl;
         }
     }
+
+    //script_pcallback(SCRIPT, on_update_ref, 0, 0);
 }
 
 void SampleApp::createScene(void)
@@ -283,12 +286,13 @@ void SampleApp::createScene(void)
     script_pcallback(SCRIPT, on_scenesetup_ref, 0, 0);
 }
 
-void SampleApp::addEntity(const char *name, const char *filename, const char *nodename,
+SceneNode* SampleApp::addEntity(const char *name, const char *filename, const char *nodename,
                           int x, int y, int z) {
     Entity *ent = mSceneMgr->createEntity(name, filename);
     SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode(nodename);
     node->attachObject(ent);
     node->setPosition(Vector3(x, y, z));
+    return node;
 }
 
 void SampleApp::spawnBall() {
