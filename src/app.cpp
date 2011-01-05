@@ -48,8 +48,8 @@ SampleApp::~SampleApp() {
 
 void SampleApp::createCamera(void) {
     mCamera = mSceneMgr->createCamera("PlayerCam");
-    mCamera->setPosition(Vector3(0,30,75));
-    mCamera->lookAt(Vector3(0,0,0));
+    mCamera->setPosition(Vector3(0,30,25));
+    mCamera->lookAt(Vector3(10,0,10));
     mCamera->setNearClipDistance(5);
 
 }
@@ -225,25 +225,25 @@ void SampleApp::update(const FrameEvent& evt) {
         return;
     }
     //_forceRegistry.updateForces(evt.timeSinceLastFrame);
-    _world->startFrame();
-    _world->runPhysics(evt.timeSinceLastFrame);
-    for (vpe_t_it it = _particles.begin(); it != _particles.end(); it++) {
-        ParticleEntity* pe = (*it);
-        //std::cout << "Handling particle: " << pe << std::endl;
-        if (pe->particle != NULL) {
-            //std::cout << "Entered particle: " << pe << std::endl;
-            Vector3 oldVec3 = pe->particle->getPosition();
-            //std::cout << "old position: " << oldVec3.x << " " << oldVec3.y << " " << oldVec3.z  << std::endl;
-            pe->particle->integrate(evt.timeSinceLastFrame);
-            Vector3 newVec3 = pe->particle->getPosition();
-            //std::cout << "new position: " << newVec3.x << " " << newVec3.y << " " << newVec3.z  << std::endl;
-            pe->node->setPosition(pe->particle->getPosition());
-        } else {
-            std::cout << "PARTICLE DEAD ==================================================================" << std::endl;
-        }
-    }
+    //_world->startFrame();
+    //_world->runPhysics(evt.timeSinceLastFrame);
+    //for (vpe_t_it it = _particles.begin(); it != _particles.end(); it++) {
+        //ParticleEntity* pe = (*it);
+        ////std::cout << "Handling particle: " << pe << std::endl;
+        //if (pe->particle != NULL) {
+            ////std::cout << "Entered particle: " << pe << std::endl;
+            //Vector3 oldVec3 = pe->particle->getPosition();
+            ////std::cout << "old position: " << oldVec3.x << " " << oldVec3.y << " " << oldVec3.z  << std::endl;
+            //pe->particle->integrate(evt.timeSinceLastFrame);
+            //Vector3 newVec3 = pe->particle->getPosition();
+            ////std::cout << "new position: " << newVec3.x << " " << newVec3.y << " " << newVec3.z  << std::endl;
+            //pe->node->setPosition(pe->particle->getPosition());
+        //} else {
+            //std::cout << "PARTICLE DEAD ==================================================================" << std::endl;
+        //}
+    //}
 
-    //script_pcallback(SCRIPT, on_update_ref, 0, 0);
+    script_pcallback(SCRIPT, on_update_ref, 0, 0);
 }
 
 void SampleApp::createScene(void)
@@ -254,21 +254,21 @@ void SampleApp::createScene(void)
     mSceneMgr->setAmbientLight( ColourValue( 1,1,1 ) );
     mSceneMgr->setShadowTechnique( SHADOWTYPE_STENCIL_ADDITIVE );
 
-    spawnBall();
+    //spawnBall();
 
     // setup ground contacts
-    cyclone::GroundContacts *ground_contact = new cyclone::GroundContacts();
-    ground_contact->init(&_world->getParticles());
-    _world->getContactGenerators().push_back(ground_contact);
+    //cyclone::GroundContacts *ground_contact = new cyclone::GroundContacts();
+    //ground_contact->init(&_world->getParticles());
+    //_world->getContactGenerators().push_back(ground_contact);
 
     // setup particle distance contacts, when they stray too much afar
-    setupParticleDistanceContacts();
+    //setupParticleDistanceContacts();
 
-    Plane plane(Vector3::UNIT_Y, 0);
+    //Plane plane(Vector3::UNIT_Y, 0);
 
-    MeshManager::getSingleton().createPlane("ground",
-        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
-        500, 500, 20, 20, true, 1, 5, 5, Vector3::UNIT_Z);
+    //MeshManager::getSingleton().createPlane("ground",
+        //ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+        //500, 500, 20, 20, true, 1, 5, 5, Vector3::UNIT_Z);
 
     //ent = mSceneMgr->createEntity("GroundEntity", "ground");
     //SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();

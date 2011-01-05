@@ -5,12 +5,16 @@
 + expose the app instance as game.app
     + game.app.setup_scene() -- to draw something on setup later
     + maybe: game.app.add_entity( filename, x,y,z )
+- need functions to translate 2d to 3d world coords and back
+    - 2d_pos_to_3d( x, y )
+    - 3d_pos_to_2d( x, y, z )
 - implement actor logic (maybe concurrently)
     - e = game.entity.new( filename, x, y, z )
     + e:update() <-- concurrent
     - e:move( x,y,z )
     + animal logic
     - ball logic
+
 - create logic in lua to render a labyrinth with models.
     + add ability to call code like ( proper wrapping required. DONE )
 
@@ -19,6 +23,7 @@
         node:getAttachedObject(0):setMaterialName("Examples/SphereMappedRustySteel")
 
     - translate a 2D grid to 3d labyrinth
+        - group common neighboring tiles and render them as one unit
 
 + find out how to do path finding, and implement in lua
 - https://code.google.com/p/simple-lua-wrapper/source/browse/LuaWrapper.h

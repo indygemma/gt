@@ -2,7 +2,8 @@ require "scheduler"
 require "entity"
 
 local GRID = {
---   1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 0
+--                     1 1 1 1 1 1 1 1 1 1 2 2 2
+--   1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
     {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, -- 1
     {1,1,3,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1}, -- 2
     {1,1,0,1,1,0,0,1,1,0,0,1,1,0,0,0,1,0,0,0,1,1}, -- 3
@@ -21,39 +22,46 @@ game.on_mouseclick = function(btn, x, y, z)
     end
 end
 
-local node
+-- valid materials are
+-- Examples/Rockwall
+-- Examples/SphereMappedRustySteel
+-- Examples/Rocky
 
-local function create_entity(name, mesh, x, y, z)
-    local node = game.app.add_entity("cube02", "cube.mesh", "cube02", 1,0,0)
+local function render_block(x, y, z, material)
+    material = material or "Examples/Rocky"
+    local node = game.app.add_entity("cubex"..x.."y"..y, "cube.mesh", "cubex"..x.."y"..y, x*1,z,y*1)
     node:setScale(0.01, 0.01, 0.01)
-    node:getAttachedObject(0):setMaterialName("Examples/Rockwall")
+    node:getAttachedObject(0):setMaterialName(material)
+end
+
+local function render_labyrinth(grid)
+    local w = table.getn(grid[1])
+    local h = table.getn(grid)
+
+    print("w:", w, "h:", h)
+    io.output("lua.log")
+    for y=1,h do
+        for x=1,w do
+            local tile = grid[y][x]
+            if tile == 1 then
+                render_block(x,y,0)
+            else
+                render_block(x,y,-1, "Examples/Rockwall")
+            end
+        end
+    end
+    io.close()
 end
 
 game.app.on_scenesetup = function()
     print("Setting up scene...")
+    -- somehow removing the first fish, makes the first 2 wall blacks not renderable??
     game.app.add_entity("fish", "fish.mesh", "fish01", 50, 50, 50)
-    game.app.add_entity("fish 2", "fish.mesh", "fish02", -50, -50, -50)
+    local penguin = game.app.add_entity("penguin", "penguin.mesh", "penguin01", 0,0,-5)
+    penguin:setScale(0.015, 0.015, 0.015)
+    --game.app.add_entity("fish 2", "fish.mesh", "fish02", -50, -50, -50)
 
-    for x=0,50 do
-        for y=0,50 do
-            print("cubex"..x..y)
-            node = game.app.add_entity("cubex"..x.."y"..y, "cube.mesh", "cubex"..x.."y"..y, x*1,0,y*1)
-            node:setScale(0.01, 0.01, 0.01)
-            node:getAttachedObject(0):setMaterialName("Examples/Rockwall")
-        end
-    end
-
-    --for i=0,50 do
-        --node = game.app.add_entity("cubey"..i, "cube.mesh", "cubey"..i, i*1,i*1,i*1)
-        --node:setScale(0.01, 0.01, 0.01)
-        --node:getAttachedObject(0):setMaterialName("Examples/Rockwall")
-    --end
-
-    --for i=0,50 do
-        --node = game.app.add_entity("cubez"..i, "cube.mesh", "cubez"..i, 0,i*1,0)
-        --node:setScale(0.01, 0.01, 0.01)
-        --node:getAttachedObject(0):setMaterialName("Examples/Rockwall")
-    --end
+    render_labyrinth(GRID)
 
     print("End of scene setup")
 end

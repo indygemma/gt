@@ -36,5 +36,9 @@ void    script_binder_pushusertype(script_t *script, void *udata,
                                                      const char *tname);
 void   *script_binder_checkusertype(script_t *script, int index,
                                                       const char *tname);
+void    script_binder_pushusertype_nogc(script_t *script, void *udata,
+                                                          const char *tname);
+void   *script_binder_checkusertype_nogc(script_t *script, int index,
+                                                           const char *tname);
 void    script_binder_releaseusertype(script_t *script, void *udata);
 #endif

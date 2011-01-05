@@ -195,6 +195,39 @@ void *script_binder_checkusertype(script_t *script, int index,
     return *udata;
 }
 
+void script_binder_pushusertype_nogc(script_t *script, void *udata,
+                                                         const char *tname) {
+    lua_State *L = script->L;
+    lua_pushlightuserdata(L, udata);
+    lua_rawget(L, LUA_ENVIRONINDEX); // get object in env table
+    if (lua_isnil(L, -1)) {
+        lua_newtable(L);
+        lua_pushlightuserdata(L, udata);
+        lua_setfield(L,-2,"_pointer");
+        luaL_getmetatable(L,tname);
+        lua_setmetatable(L,-2);
+        lua_pushlightuserdata(L, udata);
+        lua_pushvalue(L,-2);
+        lua_rawset(L,LUA_ENVIRONINDEX);
+    }
+}
+
+void *script_binder_checkusertype_nogc(script_t *script, int index,
+                                                        const char *tname) {
+    lua_State *L = script->L;
+    lua_getfield(L, LUA_REGISTRYINDEX, tname); // get type mt
+    lua_getmetatable(L, index);                // get associated mt
+    // notice: in the book there is inheritance support, we don't support it here
+    if (lua_rawequal(L, -1, -2)) {
+        lua_pop(L, 2);                      // pop string and mt
+        lua_getfield(L, index, "_pointer");
+        void *udata = lua_touserdata(L,-1);
+        return udata;
+    }
+    luaL_typerror(L, index, tname);
+    return NULL;
+}
+
 void script_binder_releaseusertype(script_t *script, void *udata) {
     lua_pushlightuserdata(script->L, udata);
     lua_pushnil(script->L);

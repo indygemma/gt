@@ -21,8 +21,8 @@ bool MyListener::processUnbufferedMouseInput(const FrameEvent& evt) {
         mRightMouseDown = true;
     } else if (mLeftMouseDown) {
         // left mouse released. initiate click
-        std::cout << "PRESSED LEFT MOUSE KEY: Spawning Particles" << std::endl;
-        mApp->spawnBox(0,400,0);
+        //std::cout << "PRESSED LEFT MOUSE KEY: Spawning Particles" << std::endl;
+        //mApp->spawnBox(0,400,0);
 
         // run callback
         lua_pushinteger(SCRIPT->L, 1);
@@ -34,7 +34,7 @@ bool MyListener::processUnbufferedMouseInput(const FrameEvent& evt) {
 
         mLeftMouseDown = false;
     } else if (mRightMouseDown) {
-        mApp->shootBall();
+        //mApp->shootBall();
 
         // run callback
         lua_pushinteger(SCRIPT->L, 2);
@@ -57,12 +57,12 @@ bool MyListener::frameStarted(const FrameEvent& evt)
 bool MyListener::frameRenderingQueued(const FrameEvent& evt)
 {
     mTimer += evt.timeSinceLastFrame;
-    if (mTimer >= 1.0) {
-        // sweep particles every second
-        std::cout << "Time accumulated: " << mTimer << std::endl;
-        mApp->sweepParticles();
-        mTimer = 0.0;
-    }
+    //if (mTimer >= 1.0) {
+        //// sweep particles every second
+        //std::cout << "Time accumulated: " << mTimer << std::endl;
+        //mApp->sweepParticles();
+        //mTimer = 0.0;
+    //}
     mApp->update(evt);
     return ExampleFrameListener::frameRenderingQueued(evt);
 }
