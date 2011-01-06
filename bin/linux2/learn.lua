@@ -15,7 +15,8 @@ local GRID = {
 
 -- A.printnodes(A.findpath(GRID, 3,2,20,4))
 
-require "entity"
+require "actor"
+require "actors/animal"
 
 a = Animal("angie")
 a2 = Animal("brian")

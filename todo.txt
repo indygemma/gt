@@ -5,27 +5,34 @@
 + expose the app instance as game.app
     + game.app.setup_scene() -- to draw something on setup later
     + maybe: game.app.add_entity( filename, x,y,z )
-- need functions to translate 2d to 3d world coords and back
-    - 2d_pos_to_3d( x, y )
-    - 3d_pos_to_2d( x, y, z )
++ need functions to translate 2d to 3d world coords and back
+    + 2d_pos_to_3d( x, y )
+    + 3d_pos_to_2d( x, y, z )
 - implement actor logic (maybe concurrently)
-    - e = game.entity.new( filename, x, y, z )
+    + e = game.entity.new( filename, x, y, z )
     + e:update() <-- concurrent
     - e:move( x,y,z )
+    - e:lookAt( x,y,z )
     + animal logic
     - ball logic
++ need functions to return a random "0" tile, to randomly spawn things
+# expose vector type
 
-- create logic in lua to render a labyrinth with models.
++ create logic in lua to render a labyrinth with models.
     + add ability to call code like ( proper wrapping required. DONE )
 
         node = game.app.add_entity("cube"..i, "cube.mesh", "cube"..i, i*1,0,0)
         node:setScale(0.01, 0.01, 0.01)
         node:getAttachedObject(0):setMaterialName("Examples/SphereMappedRustySteel")
 
-    - translate a 2D grid to 3d labyrinth
-        - group common neighboring tiles and render them as one unit
+    + translate a 2D grid to 3d labyrinth
+        # group common neighboring tiles and render them as one unit ( not required )
+
 
 + find out how to do path finding, and implement in lua
+
+-----
+
 - https://code.google.com/p/simple-lua-wrapper/source/browse/LuaWrapper.h
 - great thread on gamedev where the OP outlines the way he does C++ class binding without external dependencies
   http://www.gamedev.net/community/forums/topic.asp?topic_id=571139

@@ -31,6 +31,7 @@ void run_in_lua(script_t *script, int (*f)(lua_State*)) {
 void script_bind(script_t *script) {
     //luaopen_game(script->L);
     run_in_lua(script, luaopen_game);
+    lua_settop(script->L, 0);
 }
 
 void script_error(script_t *script, const char *fmt, ...) {
@@ -189,9 +190,13 @@ void script_binder_pushusertype(script_t *script, void *udata,
 
 void *script_binder_checkusertype(script_t *script, int index,
                                                       const char *tname) {
+    //printf("CHECK USER TYPE start\n");
     void **udata = (void**)luaL_checkudata(script->L, index, tname);
-    if (udata == 0)
+    //printf("udata == 0: %d. %d\n", udata == 0, udata);
+    if (udata == 0) {
+        //printf("ERROR: UDATA IS EMPTY. tname = %s\n", tname);
         luaL_typerror(script->L,index,tname);
+    }
     return *udata;
 }
 
@@ -218,11 +223,15 @@ void *script_binder_checkusertype_nogc(script_t *script, int index,
     lua_getfield(L, LUA_REGISTRYINDEX, tname); // get type mt
     lua_getmetatable(L, index);                // get associated mt
     // notice: in the book there is inheritance support, we don't support it here
-    if (lua_rawequal(L, -1, -2)) {
-        lua_pop(L, 2);                      // pop string and mt
-        lua_getfield(L, index, "_pointer");
-        void *udata = lua_touserdata(L,-1);
-        return udata;
+    while( lua_istable(L, -1) ) {
+        if (lua_rawequal(L, -1, -2)) {
+            lua_pop(L, 2);                      // pop string and mt
+            lua_getfield(L, index, "_pointer");
+            void *udata = lua_touserdata(L,-1);
+            return udata;
+        }
+        lua_getfield(L,-1,"_base");
+        lua_replace(L,-2);
     }
     luaL_typerror(L, index, tname);
     return NULL;

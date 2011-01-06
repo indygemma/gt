@@ -1,56 +1,54 @@
--- entity.lua
---
--- Entity definition with a concurrent update kernel
---
+require "actor"
+utils = require "utils"
 
--- simulation goal:
---
---   spawn several animals into the level.
---   spawn several toys into the level.
---   spawn several food stops into the level.
---   animals lock into a random toy in the level and follow them around
---   toys are either caught or not caught. if they are not caught then they pick a random position and try to move to that position on the map
---   if they are caught then they stop at the position
---   if the animal is hungry he chooses to ignore the toy and targets food instead. (random)
---   with time the hunger level of an animal increases
---
-require "class"
-require "scheduler"
-
-Entity = class()
-
-function Entity:__init ()
-    if self.update then
-        scheduler.register( self.update, {self} )
-    end
-end
-
-function Entity:hello ()
-    print(self.thing)
-end
-
-A = require "astar"
-
-Animal = class(Entity)
+Animal = class(Actor)
 
 local SEEKING_TOY  = 0
 local PLAYING_TOY  = 1
 local SEEKING_FOOD = 2
 local EATING_FOOD  = 3
 
-function Animal:__init(name)
-    Entity.__init(self)
+function Animal:__init(world, name)
+    Actor.__init(self, world)
     self.name                  = name
     self.hunger_level          = 0
     self.critical_hunger_level = math.random() * 100
-    --self:seek_toy()
-    self.state = EATING_FOOD
+    self:seek_toy()
+end
+
+function Animal:print_pos()
+    if self.node then
+        local x,y = self.node:getPosition()
+        print("POS ", x, " ", y)
+    end
 end
 
 function Animal:seek_toy()
     --target onto a toy in the field
     --TODO: implement targeting logic
     self.state = SEEKING_TOY
+    if not self.node then return end
+    print(string.format("seeking toy, there are %d other animals and %d toys", table.getn(self.world.ANIMALS), table.getn(self.world.TOYS)))
+    local count = table.getn(self.world.TOYS)
+    if count > 0 then
+        self.target = utils.random_entry(self.world.TOYS)
+        test = self.world.TEST[1]
+        print(" self (address) ", self)
+        print( "TEST address", test )
+        print("chosen target:", self.target.name)
+        print("self.target", self.target)
+        print("self.target.node pointer", self.target.node, self.target.node._pointer)
+        table.foreach( self.world.TOYS, function(k,v) print("toy pointers", v, v.node,v.node._pointer,v.node.mt) end )
+        print("1asds", self.target.node)
+        --self.target.node:setScale(1,1,1)
+        --table.foreach(self.target.node, print)
+        print( "self.target.node.getPosition", self.target.node.getPosition )
+        x,y,z = self.target.node:getPosition()
+        print("positions:", x,y,z)
+        local x,y = self.target:get_pos()
+        print("HUH")
+        print("target position:", x, ":", y)
+    end
 end
 
 function Animal:update_hunger(n)
@@ -100,6 +98,10 @@ function Animal:update()
             coroutine.yield({ sleep=5 })
             self:seek_toy()
         elseif self.state == SEEKING_TOY then
+            if not self.target then
+                self:seek_toy()
+                coroutine.yield({ sleep=0.15 })
+            end
             -- we're locked on to a toy
             -- check whether we're hungry enough to seek food
             if self:hungry() then

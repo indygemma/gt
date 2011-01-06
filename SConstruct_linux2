@@ -12,7 +12,7 @@ include_dirs = [
     "../include_linux2/bullet-2.76",
     "/usr/include/OGRE",
     "include",
-    "lib/luajit",
+    "lib/lua",
     "src/lua",
 ]
 
@@ -22,7 +22,7 @@ library_dirs = [
     "../include_linux2/bullet-2.76/LinearMath",
     "../include_linux2/bullet-2.76/BulletMultiThreaded",
     "../include_linux2/bullet-2.76/BulletSoftBody",
-    "lib/luajit"
+    "lib/lua"
 ]
 
 libraries = [
@@ -34,7 +34,7 @@ libraries = [
     "OgreMain",
     #"BulletMultiThreaded",
     #"BulletSoftBody",
-    "luajit",
+    "lua",
     "dl",
     "m",
 ]

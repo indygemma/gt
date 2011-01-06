@@ -4,6 +4,8 @@
 -- e.g Entity update methods run as coroutines
 --
 
+print (1)
+
 scheduler = {}
 
 local _coros = {} -- registered coroutines
@@ -47,9 +49,14 @@ local function step()
                 end
             end
             if v.sleep == nil then
+                print("EXECUTING CORO", v.co, v.args)
+                print("unpacking args:", unpack(v.args))
+                print("args", v.args)
+                print("args[1]:", v.args[1])
                 errfree,val = coroutine.resume(v.co, unpack(v.args))
                 if not errfree then
-                    print( val )
+                    print(debug.traceback())
+                    print( "coroutine had error:", val )
                 else
                     if val ~= nil then
                         if val.sleep ~= nil then
@@ -74,4 +81,5 @@ end
 scheduler._coros   = _coros
 scheduler.register = register
 scheduler.step     = step
+print ("scheduler -- end")
 return scheduler
