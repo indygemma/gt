@@ -44,6 +44,7 @@ public:
     int on_mouseclick_ref;
     int on_scenesetup_ref;
     int on_update_ref;
+    int on_keypressed_ref;
 
 private:
 

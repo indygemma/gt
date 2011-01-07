@@ -40,6 +40,7 @@ _world(new cyclone::ParticleWorld(1000))
     on_mouseclick_ref = script_register_callback(SCRIPT, "game.on_mouseclick");
     on_scenesetup_ref = script_register_callback(SCRIPT, "game.app.on_scenesetup");
     on_update_ref     = script_register_callback(SCRIPT, "game.app.on_update");
+    on_keypressed_ref = script_register_callback(SCRIPT, "game.on_keypressed");
 }
 
 SampleApp::~SampleApp() {

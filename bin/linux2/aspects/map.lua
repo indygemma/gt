@@ -111,10 +111,12 @@ RandomMapSpawn.TYPE = "RandomMapSpawn"
 function RandomMapSpawn:__init(data)
     assert(data.candidate_tiles ~= nil)
     assert(data.activate ~= nil)
+    assert(type(data.activate) == "table")
     assert(data.actor_class ~= nil)
     Aspect.__init(self)
     self.candidate_tiles = data.candidate_tiles
-    self.activate_type   = data.activate
+    self.activate_class  = data.activate[1]
+    self.activate_key    = data.activate[2]
     self.actor_class     = data.actor_class
 end
 
@@ -136,24 +138,18 @@ end
 function RandomMapSpawn:spawnOnRandomEmptyFloor( actor_class )
     local map_aspects = ASPECT_MANAGER:getAspect( Map2D )
     local count = 0
-    print("THERE ARE ", table.getn(map_aspects), " map_aspects")
     for i,aspect in ipairs(map_aspects) do
         count = count + 1
         local coords = random_entry( aspect.empty_floor_coords )
-        print("SPAWN COUNT ", count, " @",coords.x,coords.y)
         createActor( actor_class, coords.x, coords.y )
     end
 end
 
 function RandomMapSpawn:update()
-    -- assumes only one MouseInput aspect running
-    local mouse_input = self:getActor():getAspect(MouseInput)
-    local clicked = mouse_input:getClickStatus( self.activate_type )
-    if clicked then
-        print("")
-        print("--- MOUSE CLICKED, spawning stuff ---")
-        print("ACTIVATION: ", self.activate_type)
-        --local actor_class = ASPECT_MANAGER:getActorClass( self:getActor().name )
+    -- assumes only one Mouse/Keyboard-Input aspect running
+    local input = self:getActor():getAspect(self.activate_class)
+    local passed = input:getStatus( self.activate_key )
+    if passed then
         self:spawnOnRandomEmptyFloor( self.actor_class )
     end
 end

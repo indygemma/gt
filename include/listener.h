@@ -11,6 +11,8 @@ private:
     SampleApp* mApp;
     bool       mLeftMouseDown;
     bool       mRightMouseDown;
+    bool       mMiddleMouseDown;
+    bool       mSpaceKeyDown;
     Ogre::Real mTimer;
 
 public:

@@ -18,3 +18,13 @@ game.on_mouseclick = function( btn, x, y )
         aspect:on_mouseclick( btn, x, y)
     end
 end
+
+game.on_keypressed = function( keyname )
+    local keyboards = ASPECT_MANAGER:getAspect(KeyboardInput)
+    if keyboards then
+        for i,aspect in ipairs(keyboards) do
+            print(" HANDLE KEY PRESS ", keyname, aspect )
+            aspect:on_keypressed( keyname )
+        end
+    end
+end

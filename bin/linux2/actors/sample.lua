@@ -107,7 +107,8 @@ Animal.aspects = {
             -- hunger level". This is the default state, because
             -- we start with hunger level of 0.
             activate=function(self)
-                return self:getActor():getAspect(Hunger):level() < 25
+                return self:getActor():getAspect(Hunger):level() < 25 and
+                       self:getActor():getAspect(Targeting):currentTarget() == "toy"
             end,
         }
     },
@@ -169,14 +170,15 @@ RandomActorSpawner.name = "random_actor_spawner"
 RandomActorSpawner.aspects = {
     { RandomMapSpawn, {
         candidate_tiles = 0,
-        activate = MouseInput.LEFT_MOUSE_CLICK,
+        activate = { MouseInput, MouseInput.LEFT_MOUSE_CLICK },
         actor_class = Animal
     }},
     { RandomMapSpawn, {
         candidate_tiles = 0,
-        activate = MouseInput.RIGHT_MOUSE_CLICK,
+        activate = { KeyboardInput, KeyboardInput.SPACE },
         actor_class = Toy
     }},
-    MouseInput
+    MouseInput,
+    KeyboardInput
 }
 ASPECT_MANAGER:registerActor(RandomActorSpawner)

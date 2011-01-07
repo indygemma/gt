@@ -2,6 +2,14 @@
 #include <iostream>
 
 bool MyListener::processUnbufferedKeyInput(const FrameEvent& evt) {
+    if (mKeyboard->isKeyDown(OIS::KC_SPACE)) {
+        mSpaceKeyDown = true;
+    } else if (mSpaceKeyDown) {
+        lua_pushstring(SCRIPT->L, "space");
+        script_pcallback(SCRIPT, mApp->on_keypressed_ref, 1, 0);
+        mSpaceKeyDown = false;
+    }
+
     if(mKeyboard->isKeyDown(OIS::KC_L) && mTimeUntilNextToggle <= 0)
         {
             std::stringstream ss;
@@ -19,6 +27,8 @@ bool MyListener::processUnbufferedMouseInput(const FrameEvent& evt) {
         mLeftMouseDown = true;
     } else if (ms.buttonDown( OIS::MB_Right ) ) {
         mRightMouseDown = true;
+    } else if (ms.buttonDown( OIS::MB_Middle ) ) {
+        mMiddleMouseDown = true;
     } else if (mLeftMouseDown) {
         // left mouse released. initiate click
         //std::cout << "PRESSED LEFT MOUSE KEY: Spawning Particles" << std::endl;
@@ -45,6 +55,15 @@ bool MyListener::processUnbufferedMouseInput(const FrameEvent& evt) {
         script_stack_pop(SCRIPT, 0);
 
         mRightMouseDown = false;
+    } else if (mMiddleMouseDown) {
+        // run callback
+        lua_pushinteger(SCRIPT->L, 3);
+        lua_pushinteger(SCRIPT->L, ms.X.abs);
+        lua_pushinteger(SCRIPT->L, ms.Y.abs);
+        lua_pushinteger(SCRIPT->L, ms.Z.abs);
+        script_pcallback(SCRIPT, mApp->on_mouseclick_ref, 4, 0);
+        script_stack_pop(SCRIPT, 0);
+        mMiddleMouseDown = false;
     }
     return ExampleFrameListener::processUnbufferedMouseInput(evt);
 }
