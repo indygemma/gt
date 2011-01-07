@@ -1,7 +1,5 @@
 require "aspects/base"
 
-local COUNT = 0
-
 MouseInput = class(Aspect)
 MouseInput.TYPE = "MouseInput"
 
@@ -14,14 +12,11 @@ function MouseInput:__init()
 end
 
 function MouseInput:on_mouseclick( btn, x, y )
-    COUNT = COUNT + 1
-    print(" MOUSE CLICK COUNT: ", COUNT, btn, x, y, self )
     self.clicked[btn] = { x=x, y=y }
 end
 
 function MouseInput:getStatus( btn )
     if self.clicked[btn] ~= false then
-        print(" MOUSE ACTIVATED ", btn, self )
         return self.clicked[btn]
     end
     return false

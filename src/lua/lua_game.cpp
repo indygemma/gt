@@ -68,9 +68,7 @@ static int lua_node_getattachedobject(lua_State *L) {
 }
 
 static int lua_node_setscale( lua_State *L ) {
-    std::cout << "SET SCALE BEGIN" << std::endl;
     Ogre::SceneNode *node = (Ogre::SceneNode*) script_binder_checkusertype_nogc(SCRIPT, 1, "node");
-    std::cout << "SET SCALE stage 2" << std::endl;
     node->setScale(
             luaL_checknumber(L, 2),
             luaL_checknumber(L, 3),
@@ -80,17 +78,8 @@ static int lua_node_setscale( lua_State *L ) {
 }
 
 static int lua_node_getposition( lua_State *L ) {
-    int idx = 0;
-    if (lua_isthread(L,1)) {
-        std::cout << "WE HAVE A MOFO THREAD" << std::endl;
-        idx += 1;
-    }
-    std::cout << "STACK SIZE: " << script_stack_size(SCRIPT) << std::endl;
-    std::cout << "START GET POSITION" << std::endl;
-    Ogre::SceneNode *node = (Ogre::SceneNode*) script_binder_checkusertype_nogc(SCRIPT, idx+1, "node");
-    std::cout << "GOT NODE" << std::endl;
+    Ogre::SceneNode *node = (Ogre::SceneNode*) script_binder_checkusertype_nogc(SCRIPT, 1, "node");
     Ogre::Vector3 pos = node->getPosition();
-    std::cout << "GOT POSITION: " << pos.x << ":" << pos.y << ":" << pos.z << std::endl;
     lua_pushnumber(L, pos.x);
     lua_pushnumber(L, pos.y);
     lua_pushnumber(L, pos.z);
@@ -135,7 +124,7 @@ static int lua_entity_destroy( lua_State *L ) {
     void *udata = script_binder_checkusertype_nogc(SCRIPT, 1, "entity");
     script_binder_releaseusertype(SCRIPT, udata);
     Ogre::Entity *entity = (Ogre::Entity*) udata;
-    std::cout << "called destroy for entity " << entity->getName() << std::endl;
+    //std::cout << "called destroy for entity " << entity->getName() << std::endl;
     delete entity;
     return 0;
 }

@@ -20,3 +20,4 @@ function Position:set( x, y, z )
     self.y = self.y_offset + y
     self.z = self.z_offset + z
 end
+

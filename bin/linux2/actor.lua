@@ -118,8 +118,24 @@ function ActorManager:update()
     -- is defined by the order the aspect classes are entered
     -- by the user)
     for uuid,actor in pairs(self.actors) do
-        for i,aspect in ipairs(actor.aspect_instances) do
-            aspect:update()
+        local doUpdate = false
+        local sleepable = actor:getAspect(Sleepable)
+        if sleepable then
+            if sleepable:isAwake() then
+                doUpdate = true
+            else
+                -- we still have to update the sleepable aspect,
+                -- or we never wake up
+                sleepable:update()
+            end
+        else
+            doUpdate = true
+        end
+        -- do update only when we're awake or not marked sleepable
+        if doUpdate then
+            for i,aspect in ipairs(actor.aspect_instances) do
+                aspect:update()
+            end
         end
     end
 end

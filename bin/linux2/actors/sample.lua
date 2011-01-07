@@ -68,7 +68,7 @@ Animal = class(Actor)
 Animal.name = "penguin"
 Animal.aspects = {
     { MapItem, { id=3 }},
-    Position,
+    { Position, { z_offset = 5 } },
     Movement,
     { Visual,  {
             mesh = "penguin.mesh",
@@ -76,21 +76,21 @@ Animal.aspects = {
         }
     },
     Sleepable,
-    { Targeting, { targets = {"food", "toy"} } },
+    { Targeting, { current="toy", targets = {"food", "toy"} } },
     { ai.Seeking, {
             target= "food",
             -- this translates to: "seek food once we're hungry"
             activate=function(self)
                 return self:getActor():getAspect(Hunger):isCritical()
             end,
-            sleep=0.25 -- update every 250ms
+            sleep=2.25 -- update every 250ms
         }
     },
     { ai.Idle, {
             -- we enter this state when we've reached food, update
             -- every 750ms, and decrease the hunger level by 15 each
             -- tick
-            sleep=0.75,
+            sleep=2.75,
             update=function(self)
                 self:getAspect(Hunger):decrease(15)
             end,
@@ -102,6 +102,7 @@ Animal.aspects = {
         }
     },
     { ai.Seeking, {
+            sleep=1.0,
             target="toy",
             -- this tranlates to: "seek toy once we're below 25
             -- hunger level". This is the default state, because
@@ -138,14 +139,14 @@ Toy.aspects = {
             activate=function(self)
                 return not self:getActor():getAspect(Target):targeted()
             end,
-            sleep=0.5
+            sleep=2.5
         }
     },
     { ai.Idle, {
             activate=function(self)
                 return self:getActor():getAspect(Target):distanceScore() < 2
             end,
-            sleep=0.75
+            sleep=2.75
         }
     }
 }

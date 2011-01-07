@@ -16,12 +16,6 @@ end
 
 function Visual:setup()
     local pos = self:getActor():getAspect(Position)
-    print("@ visual:setup", pos.x, pos.y)
-    print("uuid ", self:getActor().uuid)
-    print("self.mesh: ", self.mesh)
-    print("pos.x ", pos.x)
-    print("pos.y ", pos.y)
-    print("game.app.add_entity", game.app.add_entity)
     local scene_node = game.app.add_entity(
                         self:getActor().uuid,
                         self.mesh,
@@ -34,3 +28,4 @@ function Visual:setup()
         scene_node:getAttachedObject(0):setMaterialName(self.material)
     end
 end
+

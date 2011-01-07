@@ -12,3 +12,16 @@ function Hunger:__init(data)
     self.hunger_increase_rate = data.increase_rate
     self.hunger_critical      = data.critical
 end
+
+function Hunger:isCritical()
+    return self.hunger_critical <= self.hunger_level
+end
+
+function Hunger:level()
+    return self.hunger_level
+end
+
+function Hunger:update()
+    print("increasing hunger level", self.hunger_level, os.clock(), self:getActor().uuid)
+    self.hunger_level = self.hunger_level + self.hunger_increase_rate
+end
