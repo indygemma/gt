@@ -1,45 +1,34 @@
-A = require "astar"
+require "aspects/hunger"
+require "aspects/map"
 
--- EXAMPLE USAGE --
-local GRID = {
---   1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 0
-    {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, -- 1
-    {1,1,3,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1}, -- 2
-    {1,1,0,1,1,0,0,1,1,0,0,1,1,0,0,0,1,0,0,0,1,1}, -- 3
-    {1,1,0,0,0,0,0,1,1,0,0,1,1,0,0,0,1,0,0,2,1,1}, -- 4
-    {1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,0,0,0,1,1}, -- 5
-    {1,1,1,1,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1}, -- 6
-    {1,1,1,1,4,0,0,0,0,0,0,1,1,0,0,0,1,0,0,0,1,1}, -- 7
-    {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, -- 8
-}
-
--- A.printnodes(A.findpath(GRID, 3,2,20,4))
-
-require "actor"
-require "actors/animal"
-
-a = Animal("angie")
-a2 = Animal("brian")
-
-function customloop(a,b,c)
-    local snapshot = os.clock()
-    local s1 = os.clock()
-    local count = 0
-    while 1 do
-        count = count + 1
-        print "----"
-        print( string.format("just waited %.2f seconds", os.clock()-s1))
-        print( string.format("Elapsed time %.2f", os.clock() - snapshot))
-        print("adhoc coroutine", count)
-        print( a,b,c )
-        print "----"
-        s1 = os.clock()
-        coroutine.yield({sleep=0.5})
-    end
+function dump(name, klass)
+    print( name, klass, " klass._base: ", klass._base, " metatable: ", getmetatable(klass), " instance of ", klass._instanceof )
 end
 
-scheduler.register(customloop, {1,2,3})
+--dump( "Map2D          ", Map2D )
+--dump( "Map2D Instance ", Map2D() )
+--dump( "Hunger         ",  Hunger )
+--dump( "Hunger Instance", Hunger() )
 
-for i=1,5000000 do
-    scheduler.step()
-end
+require "actors/sample"
+
+local actors_map2d = ASPECT_MANAGER:getActorsWithAspectClass( Map2D )
+local actors_mapitem = ASPECT_MANAGER:getActorsWithAspectClass( MapItem )
+
+print( table.getn(actors_map2d) )
+print( table.getn(actors_mapitem) )
+table.foreach( actors_mapitem, function(k,v)
+    print (k.name)
+    print (v.aspect.TYPE)
+    print (v.args.id)
+end )
+
+a1 = ACTOR_MANAGER:create(Level)
+a2 = ACTOR_MANAGER:create(Level)
+a3 = ACTOR_MANAGER:create(Animal)
+
+print( Level )
+print( "a1 Map2d instance: ", a1:getAspect(Map2D) )
+print( "a2 Map2d instance: ", a2:getAspect(Map2D) )
+
+--a1:getAspect(Map2D):setup()

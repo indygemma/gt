@@ -2,109 +2,181 @@ require "actor"
 require "aspects/target"
 require "aspects/visual"
 require "aspects/ai/animal"
+require "aspects/ai/toy"
 require "aspects/movement"
 require "aspects/position"
 require "aspects/sleep"
 require "aspects/hunger"
 require "aspects/map"
+require "aspects/input"
+require "aspects/ai/seeking"
+require "aspects/ai/idle"
 
-Level = Actor()
+Level = class(Actor)
+Level.name = "level"
 Level.aspects = {
-    2DMap {
-        grid = {
-        --                     1 1 1 1 1 1 1 1 1 1 2 2 2
-        --   1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, -- 1
-            {1,1,3,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1}, -- 2
-            {1,1,0,1,1,0,0,1,1,0,0,1,1,0,0,0,1,0,0,0,1,1}, -- 3
-            {1,1,0,0,0,0,0,1,1,0,0,1,1,0,0,0,1,0,0,2,1,1}, -- 4
-            {1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,0,0,0,1,1}, -- 5
-            {1,1,1,1,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1}, -- 6
-            {1,1,1,1,4,0,0,0,0,0,0,1,1,0,0,0,1,0,0,0,1,1}, -- 7
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, -- 8
+    { Map2D,  {
+            origin = { 0, 0 },
+            grid = {
+            --                     1 1 1 1 1 1 1 1 1 1 2 2 2
+            --   1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
+                {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, -- 1
+                {1,1,3,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1}, -- 2
+                {1,1,0,1,1,0,0,1,1,0,0,1,1,0,0,0,1,0,0,0,1,1}, -- 3
+                {1,1,0,0,0,0,0,1,1,0,0,1,1,0,0,0,1,0,0,2,1,1}, -- 4
+                {1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,0,0,0,1,1}, -- 5
+                {1,1,1,1,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1}, -- 6
+                {1,1,1,1,4,0,0,0,0,0,0,1,1,0,0,0,1,0,0,0,1,1}, -- 7
+                {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, -- 8
+            }
         }
     }
 }
-Level:register()
+ASPECT_MANAGER:registerActor(Level)
 
-Wall = Actor("wall")
+Wall = class(Actor)
+Wall.name = "wall"
 Wall.aspects = {
-    MapItem 1,
-    Position(),
-    Visual {
-        mesh     = "cube.mesh",
-        material = "Examples/Rocky",
-        scale    = { 0.01, 0.01, 0.01 }
+    { MapItem, { id=1 } },
+    Position,
+    { Visual,  {
+            mesh     = "cube.mesh",
+            material = "Examples/Rocky",
+            scale    = { 0.01, 0.01, 0.01 }
+        }
     }
 }
-Wall:register()
+ASPECT_MANAGER:registerActor(Wall)
 
-Floor = Actor("floor")
+Floor = class(Actor)
+Floor.name = "floor"
 Floor.aspects = {
-    -- anything but 1 is rendered as floor
-    MapItem function(i) return i != 1 end,
-    Position { z_offset = -1 },
-    Visual {
-        mesh     = "cube.mesh",
-        material = "Examples/Rockwall"
-        scale    = { 0.01, 0.01, 0.01 }
+    -- anything but 1 is rendered as floor, with a -1 z-offset
+    { MapItem, { f=function(i) return i ~= 1 end } },
+    { Position, { z_offset = -1 } },
+    { Visual,  {
+            mesh     = "cube.mesh",
+            material = "Examples/Rockwall",
+            scale    = { 0.01, 0.01, 0.01 }
+        }
     },
-    Target("floor") -- let other actors target this as "floor"
+    { Target, { name="floor" } }, -- let other actors target this as "floor"
 }
-Floor:register()
+ASPECT_MANAGER:registerActor(Floor)
 
-Animal = Actor("penguin")
+Animal = class(Actor)
+Animal.name = "penguin"
 Animal.aspects = {
-    MapItem 3,
-    Position(),
-    Movement(),
-    MouseInput(),
-    -- randomly spawn more of my type when left mouse is clicked
-    RandomMapSpawn {
-        candidate_tiles = 0,
-        activate = MouseInput.LEFT_MOUSE_CLICK
+    { MapItem, { id=3 }},
+    Position,
+    Movement,
+    { Visual,  {
+            mesh = "penguin.mesh",
+            scale = { 0.015, 0.015, 0.015 }
+        }
     },
-    Visual {
-        mesh = "penguin.mesh",
-        scale = { 0.015, 0.015, 0.015 }
+    Sleepable,
+    { Targeting, { targets = {"food", "toy"} } },
+    { ai.Seeking, {
+            target= "food",
+            -- this translates to: "seek food once we're hungry"
+            activate=function(self)
+                return self:getActor():getAspect(Hunger):isCritical()
+            end,
+            sleep=0.25 -- update every 250ms
+        }
     },
-    Sleepable(),
-    Targeting { "food", "toy" },
-    ai.Animal(),
-    Hunger { 100, -5 }
+    { ai.Idle, {
+            -- we enter this state when we've reached food, update
+            -- every 750ms, and decrease the hunger level by 15 each
+            -- tick
+            sleep=0.75,
+            update=function(self)
+                self:getAspect(Hunger):decrease(15)
+            end,
+            activate=function(self)
+                local targeting = self:getActor():getAspect(Targeting)
+                return targeting:distanceScore() < 2 and
+                       targeting:currentTarget() == "food"
+            end
+        }
+    },
+    { ai.Seeking, {
+            target="toy",
+            -- this tranlates to: "seek toy once we're below 25
+            -- hunger level". This is the default state, because
+            -- we start with hunger level of 0.
+            activate=function(self)
+                return self:getActor():getAspect(Hunger):level() < 25
+            end,
+        }
+    },
+    { Hunger,  { level=0, increase_rate=5, critical=75 } }
 }
-Animal:register()
+ASPECT_MANAGER:registerActor(Animal)
 
-Toy = Actor("toy")
+Toy = class(Actor)
+Toy.name = "toy"
 Toy.aspects = {
-    MapItem 2,
-    Movement(),
-    Position(),
-    MouseInput(),
-    RandomMapSpawn {
-        candidate_tiles = 0,
-        activate = MouseInput.RIGHT_MOUSE_CLICK
+    { MapItem, { id=2 }},
+    Movement,
+    Position,
+    { Visual, {
+            mesh = "sphere.mesh",
+            scale = { 0.0025, 0.0025, 0.0025 },
+            material = "Examples/SphereMappedRustySteel",
+        }
     },
-    Visual = {
-        mesh = "sphere.mesh",
-        scale = { 0.0025, 0.0025, 0.0025 }
+    Sleepable,
+    { Target, { name="toy" } },
+    { Targeting, { targets={ "floor" } } },
+    -- make it wander around looking for random floor tiles,
+    -- but only if not being played by animals
+    { ai.Seeking, {
+            target= "floor",
+            activate=function(self)
+                return not self:getActor():getAspect(Target):targeted()
+            end,
+            sleep=0.5
+        }
     },
-    Sleepable(),
-    Target { "toy" },
-    Targeting { "floor" },
-    ai.Toy() -- make it wander around looking for random floor tiles, but only if not being played by animals
+    { ai.Idle, {
+            activate=function(self)
+                return self:getActor():getAspect(Target):distanceScore() < 2
+            end,
+            sleep=0.75
+        }
+    }
 }
-Toy:register()
+ASPECT_MANAGER:registerActor(Toy)
 
-Food = Actor("food")
+Food = class(Actor)
+Food.name = "food"
 Food.aspects = {
-    MapItem 4,
-    Position(),
-    Visual = {
-        mesh = "fish.mesh",
-        scale = { 0.1, 0.1, 0.1 }
+    { MapItem, { id=4 } },
+    Position,
+    { Visual, {
+            mesh = "fish.mesh",
+            scale = { 0.1, 0.1, 0.1 }
+        }
     },
-    Target( "food" )
+    { Target, { name="food" } }
 }
-Food:register()
+ASPECT_MANAGER:registerActor(Food)
 
+RandomActorSpawner = class(Actor)
+RandomActorSpawner.name = "random_actor_spawner"
+RandomActorSpawner.aspects = {
+    { RandomMapSpawn, {
+        candidate_tiles = 0,
+        activate = MouseInput.LEFT_MOUSE_CLICK,
+        actor_class = Animal
+    }},
+    { RandomMapSpawn, {
+        candidate_tiles = 0,
+        activate = MouseInput.RIGHT_MOUSE_CLICK,
+        actor_class = Toy
+    }},
+    MouseInput
+}
+ASPECT_MANAGER:registerActor(RandomActorSpawner)

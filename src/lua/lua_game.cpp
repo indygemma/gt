@@ -28,7 +28,7 @@ static int lua_game_add_entity(lua_State *L) {
     int y                = luaL_checknumber(L, 5);
     int z                = luaL_checknumber(L, 6);
     Ogre::SceneNode *node = APP->addEntity(name, filename, nodename, x, y, z);
-    script_binder_pushusertype(SCRIPT, node, "node");
+    script_binder_pushusertype_nogc(SCRIPT, node, "node");
     return 1;
 }
 
@@ -42,13 +42,13 @@ static const luaL_reg lua_app_lib[] = {
 //----
 
 static int lua_node_hello(lua_State *L) {
-    Ogre::SceneNode *node = (Ogre::SceneNode*)script_binder_checkusertype(SCRIPT, 1, "node");
+    Ogre::SceneNode *node = (Ogre::SceneNode*)script_binder_checkusertype_nogc(SCRIPT, 1, "node");
     std::cout << "SceneNode update: " << node->getName() << std::endl;
     return 0;
 }
 
 static int lua_node_destroy(lua_State *L) {
-    void *udata = script_binder_checkusertype(SCRIPT, 1, "node");
+    void *udata = script_binder_checkusertype_nogc(SCRIPT, 1, "node");
     script_binder_releaseusertype(SCRIPT, udata);
     Ogre::SceneNode *node = (Ogre::SceneNode*)udata;
     delete node;
@@ -56,20 +56,20 @@ static int lua_node_destroy(lua_State *L) {
 }
 
 static int lua_node_getattachedobject(lua_State *L) {
-    Ogre::SceneNode *node = (Ogre::SceneNode*)script_binder_checkusertype(SCRIPT, 1, "node");
+    Ogre::SceneNode *node = (Ogre::SceneNode*)script_binder_checkusertype_nogc(SCRIPT, 1, "node");
     if (lua_isnumber(L, 2)) {
         Ogre::Entity *entity = (Ogre::Entity*) node->getAttachedObject(luaL_checknumber(L, 2));
-        script_binder_pushusertype(SCRIPT, entity, "entity");
+        script_binder_pushusertype_nogc(SCRIPT, entity, "entity");
     } else {
         Ogre::Entity *entity = (Ogre::Entity*) node->getAttachedObject(luaL_checkstring(L, 2));
-        script_binder_pushusertype(SCRIPT, entity, "entity");
+        script_binder_pushusertype_nogc(SCRIPT, entity, "entity");
     }
     return 1;
 }
 
 static int lua_node_setscale( lua_State *L ) {
     std::cout << "SET SCALE BEGIN" << std::endl;
-    Ogre::SceneNode *node = (Ogre::SceneNode*) script_binder_checkusertype(SCRIPT, 1, "node");
+    Ogre::SceneNode *node = (Ogre::SceneNode*) script_binder_checkusertype_nogc(SCRIPT, 1, "node");
     std::cout << "SET SCALE stage 2" << std::endl;
     node->setScale(
             luaL_checknumber(L, 2),
@@ -87,7 +87,7 @@ static int lua_node_getposition( lua_State *L ) {
     }
     std::cout << "STACK SIZE: " << script_stack_size(SCRIPT) << std::endl;
     std::cout << "START GET POSITION" << std::endl;
-    Ogre::SceneNode *node = (Ogre::SceneNode*) script_binder_checkusertype(SCRIPT, idx+1, "node");
+    Ogre::SceneNode *node = (Ogre::SceneNode*) script_binder_checkusertype_nogc(SCRIPT, idx+1, "node");
     std::cout << "GOT NODE" << std::endl;
     Ogre::Vector3 pos = node->getPosition();
     std::cout << "GOT POSITION: " << pos.x << ":" << pos.y << ":" << pos.z << std::endl;
@@ -98,7 +98,7 @@ static int lua_node_getposition( lua_State *L ) {
 }
 
 static int lua_node_setdirection( lua_State *L ) {
-    Ogre::SceneNode *node = (Ogre::SceneNode*) script_binder_checkusertype(SCRIPT, 1, "node");
+    Ogre::SceneNode *node = (Ogre::SceneNode*) script_binder_checkusertype_nogc(SCRIPT, 1, "node");
     node->setDirection(
             Ogre::Vector3(
                 luaL_checknumber(L, 2),
@@ -109,7 +109,7 @@ static int lua_node_setdirection( lua_State *L ) {
 }
 
 static int lua_node_translate( lua_State *L ) {
-    Ogre::SceneNode *node = (Ogre::SceneNode*) script_binder_checkusertype(SCRIPT, 1, "node");
+    Ogre::SceneNode *node = (Ogre::SceneNode*) script_binder_checkusertype_nogc(SCRIPT, 1, "node");
     node->translate(
             luaL_checknumber(L, 2),
             luaL_checknumber(L, 3),
@@ -132,7 +132,7 @@ static const luaL_reg lua_node_lib[] = {
 // Entity Binding
 //----
 static int lua_entity_destroy( lua_State *L ) {
-    void *udata = script_binder_checkusertype(SCRIPT, 1, "entity");
+    void *udata = script_binder_checkusertype_nogc(SCRIPT, 1, "entity");
     script_binder_releaseusertype(SCRIPT, udata);
     Ogre::Entity *entity = (Ogre::Entity*) udata;
     std::cout << "called destroy for entity " << entity->getName() << std::endl;
@@ -141,7 +141,7 @@ static int lua_entity_destroy( lua_State *L ) {
 }
 
 static int lua_entity_setmaterialname( lua_State *L ) {
-    Ogre::Entity *entity = (Ogre::Entity*) script_binder_checkusertype(SCRIPT, 1, "entity");
+    Ogre::Entity *entity = (Ogre::Entity*) script_binder_checkusertype_nogc(SCRIPT, 1, "entity");
     entity->setMaterialName(luaL_checkstring(L,2));
     return 0;
 }
