@@ -296,6 +296,28 @@ SceneNode* SampleApp::addEntity(const char *name, const char *filename, const ch
     return node;
 }
 
+ManualObject* SampleApp::addLine(const char *name) {
+    ManualObject* myManualObject =  mSceneMgr->createManualObject(name);
+    SceneNode* myManualObjectNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(name);
+
+    MaterialPtr myManualObjectMaterial = MaterialManager::getSingleton().create(name, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    myManualObjectMaterial->setReceiveShadows(false);
+    myManualObjectMaterial->getTechnique(0)->setLightingEnabled(true);
+    myManualObjectMaterial->getTechnique(0)->getPass(0)->setDiffuse(0,0,1,0);
+    myManualObjectMaterial->getTechnique(0)->getPass(0)->setAmbient(0,0,1);
+    myManualObjectMaterial->getTechnique(0)->getPass(0)->setSelfIllumination(0,0,1);
+    //myManualObjectMaterial->dispose();  // dispose pointer, not the material
+    myManualObjectNode->attachObject(myManualObject);
+
+    //myManualObject->begin(name, Ogre::RenderOperation::OT_LINE_LIST);
+
+    //myManualObject->position(10, 0, 10);
+    //myManualObject->position(200, 0, 50);
+    ////// etc
+    //myManualObject->end();
+    return myManualObject;
+}
+
 void SampleApp::spawnBall() {
     _ball = spawnParticle(Vector3(0,0,0), Vector3(0,0,0), false);
     _ball->particle->setMass(100);

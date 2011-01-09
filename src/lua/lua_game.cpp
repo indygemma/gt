@@ -32,8 +32,16 @@ static int lua_game_add_entity(lua_State *L) {
     return 1;
 }
 
+static int lua_game_add_line(lua_State *L) {
+    const char *name = luaL_checkstring(L, 1);
+    Ogre::ManualObject *obj = APP->addLine(name);
+    script_binder_pushusertype_nogc(SCRIPT, obj, "manualobject");
+    return 1;
+}
+
 static const luaL_reg lua_app_lib[] = {
     {"add_entity", lua_game_add_entity},
+    {"add_line", lua_game_add_line},
     {NULL, NULL}
 };
 
@@ -86,6 +94,28 @@ static int lua_node_getposition( lua_State *L ) {
     return 3;
 }
 
+static int lua_node_lookat( lua_State *L ) {
+    Ogre::SceneNode *self = (Ogre::SceneNode*) script_binder_checkusertype_nogc(SCRIPT, 1, "node");
+    self->lookAt(
+            Ogre::Vector3(
+                luaL_checknumber(L, 2),
+                luaL_checknumber(L, 3),
+                luaL_checknumber(L, 4)
+            ),
+            Ogre::Node::TS_WORLD,
+            Vector3::UNIT_Z
+            );
+    return 0;
+}
+
+static int lua_node_setautotracking( lua_State *L ) {
+    Ogre::SceneNode *self = (Ogre::SceneNode*) script_binder_checkusertype_nogc(SCRIPT, 1, "node");
+    bool enabled = lua_toboolean(L, 2);
+    Ogre::SceneNode *target = (Ogre::SceneNode*) script_binder_checkusertype_nogc(SCRIPT, 3, "node");
+    self->setAutoTracking( enabled, target, Vector3::UNIT_Z );
+    return 0;
+}
+
 static int lua_node_setdirection( lua_State *L ) {
     Ogre::SceneNode *node = (Ogre::SceneNode*) script_binder_checkusertype_nogc(SCRIPT, 1, "node");
     node->setDirection(
@@ -113,6 +143,8 @@ static const luaL_reg lua_node_lib[] = {
     {"setScale", lua_node_setscale},
     {"getPosition", lua_node_getposition},
     {"setDirection", lua_node_setdirection},
+    {"setAutoTracking", lua_node_setautotracking},
+    {"lookAt", lua_node_lookat},
     {"translate", lua_node_translate},
     {NULL, NULL}
 };
@@ -137,6 +169,54 @@ static int lua_entity_setmaterialname( lua_State *L ) {
 
 static const luaL_reg lua_entity_lib[] = {
     {"setMaterialName", lua_entity_setmaterialname},
+    {NULL, NULL}
+};
+
+//----
+// ManualObject Binding
+//----
+static int lua_manualobject_destroy( lua_State *L ) {
+    void *udata = script_binder_checkusertype_nogc(SCRIPT, 1, "manualobject");
+    script_binder_releaseusertype(SCRIPT, udata);
+    ManualObject *obj = (ManualObject*) udata;
+    //std::cout << "called destroy for entity " << entity->getName() << std::endl;
+    delete obj;
+    return 0;
+}
+static int lua_manualobject_clear( lua_State *L ) {
+    ManualObject *obj = (ManualObject*)script_binder_checkusertype_nogc(SCRIPT, 1, "manualobject");
+    obj->clear();
+    return 0;
+}
+
+static int lua_manualobject_begin( lua_State *L ) {
+    ManualObject *obj = (ManualObject*)script_binder_checkusertype_nogc(SCRIPT, 1, "manualobject");
+    obj->begin( luaL_checkstring(L, 2) , Ogre::RenderOperation::OT_LINE_STRIP );
+    return 0;
+}
+
+static int lua_manualobject_position( lua_State *L ) {
+    ManualObject *obj = (ManualObject*)script_binder_checkusertype_nogc(SCRIPT, 1, "manualobject");
+    obj->position(
+            luaL_checknumber(L, 2),
+            luaL_checknumber(L, 3),
+            luaL_checknumber(L, 4)
+            );
+    return 0;
+}
+
+static int lua_manualobject_end( lua_State *L ) {
+    ManualObject *obj = (ManualObject*)script_binder_checkusertype_nogc(SCRIPT, 1, "manualobject");
+    obj->end();
+    return 0;
+}
+
+static const luaL_reg lua_manaulobject_lib[] = {
+    {"destroy", lua_manualobject_destroy},
+    {"clear",   lua_manualobject_clear},
+    {"begin",   lua_manualobject_begin},
+    {"position", lua_manualobject_position},
+    {"finish",      lua_manualobject_end},
     {NULL, NULL}
 };
 
@@ -174,6 +254,7 @@ int luaopen_game(lua_State *L) {
     // bind the Ogre Entity/SceneNode Object
     script_binder_init(SCRIPT, "node",   lua_node_lib,   lua_node_destroy);
     script_binder_init(SCRIPT, "entity", lua_entity_lib, lua_entity_destroy);
+    script_binder_init(SCRIPT, "manualobject", lua_manaulobject_lib, lua_manualobject_destroy);
 
     return 0;
 }

@@ -12,20 +12,22 @@ function Visual:__init(data)
     self.mesh     = data.mesh
     self.scale    = data.scale or { 1, 1, 1 }
     self.material = data.material
+
+    self.scene_node = nil
 end
 
 function Visual:setup()
     local pos = self:getActor():getAspect(Position)
-    local scene_node = game.app.add_entity(
+    self.scene_node = game.app.add_entity(
                         self:getActor().uuid,
                         self.mesh,
                         self:getActor().uuid,
                         pos.x,
                         pos.z,
                         pos.y)
-    scene_node:setScale( self.scale[1], self.scale[2], self.scale[3] )
+    self.scene_node:setScale( self.scale[1], self.scale[2], self.scale[3] )
     if self.material then
-        scene_node:getAttachedObject(0):setMaterialName(self.material)
+        self.scene_node:getAttachedObject(0):setMaterialName(self.material)
     end
 end
 

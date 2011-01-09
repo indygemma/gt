@@ -1,3 +1,4 @@
+require "utils"
 require "actors/sample"
 
 game.app.on_scenesetup = function()

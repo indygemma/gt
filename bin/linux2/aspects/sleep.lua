@@ -29,7 +29,6 @@ end
 function Sleepable:update()
     if self.sleep_stop ~= nil then
         if (os.clock() >= self.sleep_stop) then
-            print("WAKING UP", os.clock(), self:getActor().uuid, self.sleeping, self.sleep_start, self.sleep_stop)
             self:wakeUp()
         end
     end

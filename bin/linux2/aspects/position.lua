@@ -21,3 +21,12 @@ function Position:set( x, y, z )
     self.z = self.z_offset + z
 end
 
+function Position:getPos()
+    return self.x,self.y,self.z
+end
+
+function Position:update()
+    -- synchronize position with visual's scene_node
+    local x,z,y = self:getActor():getAspect(Visual).scene_node:getPosition()
+    self:set( x, y, z )
+end

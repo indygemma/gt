@@ -7,12 +7,16 @@ function ai.Idle:__init(data)
     SleepableAI.__init(self, data)
 end
 
+function ai.Idle:on_activate()
+    print ("activated idle state")
+end
+
 function ai.Idle:update()
     SleepableAI.update(self)
     --print("ai.Idle Update", self:getActor().uuid)
     if self.active then
         -- do the idle logic
-        --print("ai.Idle is active", self:getActor().uuid)
+        print("ai.Idle is active", self:getActor().uuid)
         SleepableAI.sleep(self)
     end
 end

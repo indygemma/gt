@@ -40,6 +40,8 @@ public:
     Ogre::SceneNode* addEntity(const char *name, const char *filename, const char *nodename,
                    int x, int y, int z);
 
+    ManualObject* addLine(const char *name);
+
 
     int on_mouseclick_ref;
     int on_scenesetup_ref;

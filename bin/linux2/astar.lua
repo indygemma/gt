@@ -117,9 +117,9 @@ local function findneighbors(grid,node)
     local h = table.getn(grid)
     local result = {}
     local valid_coords = {
-        {-1,-1}, {0,-1}, {1,-1},
+                 {0,-1},
         {-1, 0},         {1, 0},
-        {-1, 1}, {0, 1}, {1, 1}
+                 {0, 1},
     }
     -- transform valid_coords to real coords
     local tile = nil

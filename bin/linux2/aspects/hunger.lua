@@ -17,6 +17,13 @@ function Hunger:isCritical()
     return self.hunger_critical <= self.hunger_level
 end
 
+function Hunger:decrease( amount )
+    self.hunger_level = self.hunger_level - amount
+    if self.hunger_level < 0 then
+        self.hunger_level = 0
+    end
+end
+
 function Hunger:level()
     return self.hunger_level
 end
