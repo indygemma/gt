@@ -89,35 +89,72 @@ C++
 
 Lua
 
-    bin/linux2/autoexec.lua           - entry point called from the Ogre 3D Application
-    bin/linux2/astar.lua              - A* Pathfinding Implementation in Lua
-    bin/linux2/scheduler.lua          - simple Lua's coroutine-based task scheduler with sleeping support
-    bin/linux2/actor.lua              - base Actor and ActorManager definition
-    bin/linux2/aspects/base.lua       - base Aspect and AspectManager definition
-    bin/linux2/aspects/position.lua   - general component to handle positioning of actors. synchronizes with
-                                        the Ogre 3D SceneNode stored under the visual aspect on the same actor.
-    bin/linux2/aspects/movement.lua   - general component to handle movement. Supplies the move() interface.
-                                        Used by the ai.Seeking Aspect attached to the same actor.
-    bin/linux2/aspects/visual.lua     - general component to determine the visual aspect of the actor. Uses Ogre 3d's
-                                        exposed objects to accomplish this (SceneNode, addEntity)
-    bin/linux2/aspects/input.lua      - supplies two components: MouseInput and KeyboardInput. Attaching these components
-                                        to an actor enables the respective input mechanisms for that actor.
-    bin/linux2/aspects/hunger.lua     - adds the concept of Hunger to the attached actor. Supplies the interface isCritical()
-                                        to determine whether the actor is hungry or not.
-    bin/linux2/aspects/target.lua     - defines two components: Target and Targeting. Attaching the first to an actor makes
-                                        that actor a target for those actors with the Targeting components attached. Targets
-                                        are identified by a simple string name. The two imortant interfaces on Targeting are:
-                                        distanceScore(), which determines the distance between the current actor and its target,
-                                        and drawPath(), which draws a line between the actor and its target.
-    bin/linux2/aspects/sleep.lua      - attached Actors are able to go into "sleep" mode, skipping the update loop for a set amount
-                                        of time (in seconds). Main interface is sleep(), alongside wakeUp(), and isAwake()
-    bin/linux2/aspects/map.lua        - defines Map, MapItem, and RandomMapSpawn. Map is component to transform a 2D Grid into a 3D
-                                        Maze. Attaching a MapItem to an Actor, makes it show up on a map identified by a tile id.
-                                        RandomMapSpawn exposes an interface to randomly spawn MapItem mapped actors on running Maps.
-    bin/linux2/aspects/ai/base.lua    - base game AI component with rule-based activation/deactivation
-    bin/linux2/aspects/ai/seeking.lua - depends on the components: movement, targeting, and sleep to provide a "seeking" behaviour
-                                        for an actor, when activated.
-    bin/linux2/aspects/ai/idle.lua    - depends on the sleep component: sleep for a specified amount of time on activation.
-    bin/linux2/actors/sample.lua      - all actor definitions using the above aspects/components for a simple "penguin in a maze" simulation
+    bin/linux2/autoexec.lua
+
+        -- entry point called from the Ogre 3D Application
+
+    bin/linux2/astar.lua
+
+        -- A* Pathfinding Implementation in Lua
+
+    bin/linux2/scheduler.lua
+
+        -- simple Lua's coroutine-based task scheduler with sleeping support
+
+    bin/linux2/actor.lua
+
+        -- base Actor and ActorManager definition
+
+    bin/linux2/aspects/base.lua
+
+        -- base Aspect and AspectManager definition
+
+    bin/linux2/aspects/position.lua
+
+        -- general component to handle positioning of actors. synchronizes with the Ogre 3D SceneNode stored under the visual aspect on the same actor.
+
+    bin/linux2/aspects/movement.lua
+
+        -- general component to handle movement. Supplies the move() interface. Used by the ai.Seeking Aspect attached to the same actor.
+
+    bin/linux2/aspects/visual.lua
+
+        -- general component to determine the visual aspect of the actor. Uses Ogre 3d's exposed objects to accomplish this (SceneNode, addEntity)
+
+    bin/linux2/aspects/input.lua
+
+        -- supplies two components: MouseInput and KeyboardInput. Attaching these components to an actor enables the respective input mechanisms for that actor.
+
+    bin/linux2/aspects/hunger.lua
+
+        -- adds the concept of Hunger to the attached actor. Supplies the interface isCritical() to determine whether the actor is hungry or not.
+
+    bin/linux2/aspects/target.lua
+
+        -- defines two components: Target and Targeting. Attaching the first to an actor makes that actor a target for those actors with the Targeting components attached. Targets are identified by a simple string name. The two imortant interfaces on Targeting are: distanceScore(), which determines the distance between the current actor and its target, and drawPath(), which draws a line between the actor and its target.
+
+    bin/linux2/aspects/sleep.lua
+
+        -- attached Actors are able to go into "sleep" mode, skipping the update loop for a set amount of time (in seconds). Main interface is sleep(), alongside wakeUp(), and isAwake()
+
+    bin/linux2/aspects/map.lua
+
+        -- defines Map, MapItem, and RandomMapSpawn. Map is component to transform a 2D Grid into a 3D Maze. Attaching a MapItem to an Actor, makes it show up on a map identified by a tile id. RandomMapSpawn exposes an interface to randomly spawn MapItem mapped actors on running Maps.
+
+    bin/linux2/aspects/ai/base.lua
+
+        -- base game AI component with rule-based activation/deactivation
+
+    bin/linux2/aspects/ai/seeking.lua
+
+        -- depends on the components: movement, targeting, and sleep to provide a "seeking" behaviour for an actor, when activated.
+
+    bin/linux2/aspects/ai/idle.lua
+
+        -- depends on the sleep component: sleep for a specified amount of time on activation.
+
+    bin/linux2/actors/sample.lua
+
+        -- all actor definitions using the above aspects/components for a simple "penguin in a maze" simulation
 
 
