@@ -1,0 +1,123 @@
+A simple demo project which uses Ogre 3D, Lua, multiple actors, A* Pathfinding,
+and a component-based game object system with a naive rule-based
+activation/deactivation scheme.
+
+This is an implementation of the ideas and concepts outlined in this article
+http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy
+this thread
+http://www.gamedev.net/topic/463508-outboard-component-based-entity-system-architecture/page__whichpage__3#3089913
+and this short paper
+http://www.josericardojunior.com/docs/DGOCSMBC_SBG08_1.pdf titled "Dynamic Game Object Component System for Mutable Behaviour Characters"
+
+A component-based approach for Game Object definition promises the mixing
+and matching of various aspects of said Game Object to form new ones,
+which is hard to accomplish in an inheritence-based approach. Components
+are generalized by extracting the different aspects of the Game object and
+hiding them behind predefined interfaces. As long as these interfaces are
+implemented, in this project's case: setup(), postSetup() and update(),
+components are free to be mixed with others to contribute its special
+functionality to an actor. The different components I've found for
+this project are: Position, Movement, Targeting, Target, Map, MapItem,
+RandomMapSpawn, ai.Seeking, ai.Idle, Visual, Sleepable, MouseInput, and
+KeyboardInput.
+
+A simple definition of a frog hunting flies might look like this:
+
+Frog = class(Actor)
+Frog.aspects = {
+    { MapItem, { id=2 } },
+    { Visual, {
+        mesh="frog.mesh",
+        material="Frog"
+        scale={ 0.5, 0.5, 0.5 }
+    }},
+    { Targeting, { targets = { "fly" } } },
+    { ai.Seeking, {
+        sleep=0.75,
+        activate=function(self)
+            return self:getActor():getAspect(Targeting):distanceScore() < 2 and
+                   self:getActor():getAspect(Hunger):isCritical()
+        end
+    }},
+    Sleepable,
+    { Hunger,  { level=0, increase_rate=0.5, critical=150 } }
+}
+
+This defines a frog which is mapped to the tile id 2 on the map and
+is visually represented using the mesh "frog.mesh", a "Frog" material
+and a half point scale on all three dimensions. It targets any Actors
+specified as Target named "fly", and will hunt it using the ai.Seeking
+behaviour if the distance between the frog and the fly is close enough,
+and is hungry enough to do so.
+
+All the actor definitions for this project can be checked out under
+bin/linux2/actors/sample.lua with the Animal actor being the most "complex"
+one for the project, using two ai.Seeking and one ai.Idle component.
+
+Instead of explicitly maintaining Finite State Machines in order to
+implement AI Actors, the component mechanism can be used to mix and
+match different behaviours depending on the environment and the actor's
+individual state. This is done by specifiying an activation rule for AI
+components, which when evaluated as true, will activate the component. As
+long it is active, its update function will run and take over the decision
+making for its owner (the actor). This way multiple actor behaviour can be
+activated and run concurrently at the same time. It is the programmers job
+to define non-conflicting AI behavour to facilitate mixing and matching of
+those behaviour. This is an implementation of the idea mentioned in this
+short paper http://www.josericardojunior.com/docs/DGOCSMBC_SBG08_1.pdf
+titled "Dynamic Game Object Component System for Mutable Behaviour
+Characters".
+
+Currently the rule matching algorithm is a naive one, in that ALL the
+activation rules are checked on each iteration. An improved version would
+include the Rete algorithm (Forgy,1982) to improve matching speed.
+
+All of the above and an A* Pathfinding module are implemented in Lua using
+a thin scripting layer to ease the binding process. The C++ side implements
+the ground infrastructure to have an Ogre 3D Application up and running.
+
+The file structure is composed of the following:
+
+C++
+
+    src/app.cpp                       - Ogre 3D Application src/app.cpp
+    src/lua/lua_game.cpp              - Object Binding: SceneNode, ManualObject and Method Binding (addEntity, addLine)
+                                        to the Lua side
+    src/script.cpp                    - Helper submodule to ease the binding process (no external dependencies)
+
+    ---------------------------------------------------------------------
+
+Lua
+
+    bin/linux2/autoexec.lua           - entry point called from the Ogre 3D Application
+    bin/linux2/astar.lua              - A* Pathfinding Implementation in Lua
+    bin/linux2/scheduler.lua          - simple Lua's coroutine-based task scheduler with sleeping support
+    bin/linux2/actor.lua              - base Actor and ActorManager definition
+    bin/linux2/aspects/base.lua       - base Aspect and AspectManager definition
+    bin/linux2/aspects/position.lua   - general component to handle positioning of actors. synchronizes with
+                                        the Ogre 3D SceneNode stored under the visual aspect on the same actor.
+    bin/linux2/aspects/movement.lua   - general component to handle movement. Supplies the move() interface.
+                                        Used by the ai.Seeking Aspect attached to the same actor.
+    bin/linux2/aspects/visual.lua     - general component to determine the visual aspect of the actor. Uses Ogre 3d's
+                                        exposed objects to accomplish this (SceneNode, addEntity)
+    bin/linux2/aspects/input.lua      - supplies two components: MouseInput and KeyboardInput. Attaching these components
+                                        to an actor enables the respective input mechanisms for that actor.
+    bin/linux2/aspects/hunger.lua     - adds the concept of Hunger to the attached actor. Supplies the interface isCritical()
+                                        to determine whether the actor is hungry or not.
+    bin/linux2/aspects/target.lua     - defines two components: Target and Targeting. Attaching the first to an actor makes
+                                        that actor a target for those actors with the Targeting components attached. Targets
+                                        are identified by a simple string name. The two imortant interfaces on Targeting are:
+                                        distanceScore(), which determines the distance between the current actor and its target,
+                                        and drawPath(), which draws a line between the actor and its target.
+    bin/linux2/aspects/sleep.lua      - attached Actors are able to go into "sleep" mode, skipping the update loop for a set amount
+                                        of time (in seconds). Main interface is sleep(), alongside wakeUp(), and isAwake()
+    bin/linux2/aspects/map.lua        - defines Map, MapItem, and RandomMapSpawn. Map is component to transform a 2D Grid into a 3D
+                                        Maze. Attaching a MapItem to an Actor, makes it show up on a map identified by a tile id.
+                                        RandomMapSpawn exposes an interface to randomly spawn MapItem mapped actors on running Maps.
+    bin/linux2/aspects/ai/base.lua    - base game AI component with rule-based activation/deactivation
+    bin/linux2/aspects/ai/seeking.lua - depends on the components: movement, targeting, and sleep to provide a "seeking" behaviour
+                                        for an actor, when activated.
+    bin/linux2/aspects/ai/idle.lua    - depends on the sleep component: sleep for a specified amount of time on activation.
+    bin/linux2/actors/sample.lua      - all actor definitions using the above aspects/components for a simple "penguin in a maze" simulation
+
+
